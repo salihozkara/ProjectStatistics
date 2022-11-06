@@ -13,7 +13,7 @@ public class ExtendRepository : Repository
         EnumLanguage = enumLanguage;
     }
 
-    public ExtendRepository()
+    private ExtendRepository()
     {
     }
     

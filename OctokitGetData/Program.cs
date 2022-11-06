@@ -27,22 +27,5 @@ application.Initialize();
 var cliService = application.ServiceProvider
     .GetRequiredService<CliService>();
 
-
-// Console.CancelKeyPress += (sender, eventArgs) =>
-// {
-//     try
-//     {
-//         var scope = application.ServiceProvider.CreateScope();
-//         var processHelper = scope.ServiceProvider.GetRequiredService<ProcessHelper>();
-//         processHelper.AllProcessKill();
-//         Log.Information("Application is shutting down...");
-//         eventArgs.Cancel = true;
-//     }
-//     catch (Exception e)
-//     {
-//         Log.Fatal(e, "Application shutdown failed!");
-//     }
-// };
-
 await cliService.RunAsync(args);
 application.Shutdown();
