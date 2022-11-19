@@ -47,50 +47,23 @@ public class CliService : ISingletonDependency
         }
 
         var languages = _languageStatisticsFactory.GetSupportedLanguages();
+        
 
         var repositories = Resources.RepositoriesJson
-// #if DEBUG
-//             .TakeLast(1)
-// #endif
             .Where(r => languages.Contains(r.Language))
             .OrderByDescending(x => x.Size)
-            .Select((x,i)=> { x.Index = i; return x; })
+            .Where((r,i) => i % arg.ComputerCount == arg.ComputerIndex)
             .ToArray();
-
-        var dataCount = repositories.Length;
-        var perComputerDataCount = dataCount / arg.ComputerCount;
-        var skipCount = perComputerDataCount * arg.ComputerIndex;
-
-        var firstSkipCount = skipCount / 2;
-        var lastSkipCount = skipCount - firstSkipCount;
-        var firstTakeCount = perComputerDataCount / 2;
-        var lastTakeCount = perComputerDataCount - firstTakeCount;
         
-        // if(arg.ComputerIndex == arg.ComputerCount - 1)
-        // {
-        //     perComputerDataCount = dataCount - perComputerDataCount * (arg.ComputerCount - 1);
-        //     firstTakeCount = perComputerDataCount / 2;
-        // }
 
-        var firstRepositories = repositories
-            .Skip(firstSkipCount)
-            .Take(firstTakeCount)
-            .ToArray();
-
-        var lastRepositories = repositories
-            .SkipLast(lastSkipCount)
-            .TakeLast(lastTakeCount)
-            .ToArray();
-
-        Logger.LogInformation($"First: {firstSkipCount} - {firstSkipCount + firstTakeCount - 1}");
-        Logger.LogInformation($"Last: {dataCount - (lastSkipCount + lastTakeCount)} - {dataCount - lastSkipCount - 1}");
-
-        return;
-        var firstTasks = firstRepositories.Select(r => ProcessRepository(r));
-        var lastTasks = lastRepositories.Select(r => ProcessRepository(r));
-
-        var tasks = firstTasks.Concat(lastTasks).OrderBy(_ => Guid.NewGuid()).ToArray();
-
+        var count = repositories.Length;
+        var totalSize = repositories.Sum(x => x.Size);
+        var totalSizeString = ToSizeString(totalSize);
+        
+        Logger.LogInformation($"Total repositories: {count}");
+        Logger.LogInformation($"Total size: {totalSizeString}");
+        
+        var tasks = repositories.Select(r => ProcessRepository(r)).OrderBy(_ => Guid.NewGuid()).ToArray();
 
         await Task.WhenAll(tasks);
 
@@ -111,7 +84,30 @@ public class CliService : ISingletonDependency
         _errorRepositories.ToJsonFile();
         
     }
+    private string ToSizeString(long totalSize)
+    {
+        var size = totalSize;
+        var sizeString = "KB";
+        if (size > 1024)
+        {
+            size /= 1024;
+            sizeString = "MB";
+        }
 
+        if (size > 1024)
+        {
+            size /= 1024;
+            sizeString = "GB";
+        }
+
+        if (size > 1024)
+        {
+            size /= 1024;
+            sizeString = "TB";
+        }
+
+        return $"{size} {sizeString}";
+    }
     private Task ProcessRepository(Repository repository, CancellationToken token = default)
     {
         var languageStatistics = _languageStatisticsFactory.GetLanguageStatistics(repository.Language);
