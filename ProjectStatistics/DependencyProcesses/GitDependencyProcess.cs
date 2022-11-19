@@ -5,10 +5,12 @@ namespace ProjectStatistics.DependencyProcesses;
 public class GitDependencyProcess : IDependencyProcess
 {
     private readonly ProcessHelper _processHelper;
+
     public GitDependencyProcess(ProcessHelper processHelper)
     {
         _processHelper = processHelper;
     }
+
     public string Name => "Git";
     public string ProcessName => "git";
 
@@ -23,10 +25,7 @@ public class GitDependencyProcess : IDependencyProcess
     public async Task<bool> SolveDependencyAsync(CancellationToken token = default)
     {
         var result = await _processHelper.RunAsync("winget", "install --id Git.Git -e --source winget");
-        if (result.Success)
-        {
-            return true;
-        }
+        if (result.Success) return true;
         token.ThrowIfCancellationRequested();
         throw new Exception("Failed to install Git");
     }

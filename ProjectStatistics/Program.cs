@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using ProjectStatistics;
 using ProjectStatistics.DependencyProcesses;
 using ProjectStatistics.Helpers;
@@ -6,7 +7,7 @@ using Serilog;
 using Serilog.Events;
 using Volo.Abp;
 
-Console.OutputEncoding = System.Text.Encoding.UTF8;
+Console.OutputEncoding = Encoding.UTF8;
 
 
 Log.Logger = new LoggerConfiguration()
@@ -26,10 +27,12 @@ using var application = AbpApplicationFactory.Create<ProjectStatisticsModule>(
     });
 application.Initialize();
 
-if(await application.ServiceProvider.DependencyProcessesCheck()){
+if (await application.ServiceProvider.DependencyProcessesCheck())
+{
     Console.WriteLine("All dependencies are installed");
 }
-else{
+else
+{
     Console.WriteLine("Some dependencies are not installed");
     Environment.Exit(1);
 }
@@ -56,6 +59,3 @@ Console.CancelKeyPress += (_, eventArgs) =>
 
 await cliService.RunAsync(args);
 application.Shutdown();
-
-
-

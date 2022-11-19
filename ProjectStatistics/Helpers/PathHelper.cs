@@ -8,10 +8,7 @@ public static class PathHelper
         {
             paths = paths.Append("./").ToArray();
             var path = Path.Combine(paths);
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
             return path;
         });

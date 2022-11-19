@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sourcemonitor_commands>
-	<command>
-    
+    <command>
+
         <!-- path is relative to this command file -->
-        
+
         <project_file>{{project_directory}}\{{project_name}}.smproj</project_file>
-        
+
         <project_language>{{project_language}}</project_language>
-        
+
         <source_directory>{{project_directory}}</source_directory>
-        
+
         <include_subdirectories>true</include_subdirectories>
-        
+
         <checkpoint_name>{{project_name}}</checkpoint_name>
 
         <modified_complexity>true</modified_complexity>
@@ -21,6 +21,6 @@
             <export_type>1 (project summary as xml)</export_type>
         </export>
 
-	</command>
+    </command>
 
 </sourcemonitor_commands>

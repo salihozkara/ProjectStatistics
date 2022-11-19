@@ -9,9 +9,6 @@ namespace ProjectStatistics.Helpers;
 
 public class ProcessHelper : ISingletonDependency
 {
-    private List<Process> Processes { get; } = new();
-    private ILogger<ProcessHelper> Logger { get; }
-
     private readonly ConcurrentDictionary<Process, Logger> _processLoggers = new();
     private readonly ConcurrentDictionary<Process, ProcessOutput> _processOutputs = new();
 
@@ -19,6 +16,9 @@ public class ProcessHelper : ISingletonDependency
     {
         Logger = logger;
     }
+
+    private List<Process> Processes { get; } = new();
+    private ILogger<ProcessHelper> Logger { get; }
 
     private Logger CreateProcessLogger(int processId)
     {
@@ -126,19 +126,13 @@ public class ProcessHelper : ISingletonDependency
 
     private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
     {
-        if (sender is not Process process)
-        {
-            return;
-        }
+        if (sender is not Process process) return;
 
         var logger = TryGetOrAddLogger(process);
 
         logger.Error(e.Data);
 
-        if (_processOutputs.TryGetValue(process, out var output))
-        {
-            output.Error += e.Data + "\n";
-        }
+        if (_processOutputs.TryGetValue(process, out var output)) output.Error += e.Data + "\n";
     }
 
     private Logger TryGetOrAddLogger(Process process)
@@ -154,18 +148,12 @@ public class ProcessHelper : ISingletonDependency
 
     private void OutputDataReceived(object sender, DataReceivedEventArgs e)
     {
-        if (sender is not Process process)
-        {
-            return;
-        }
+        if (sender is not Process process) return;
 
         var logger = TryGetOrAddLogger(process);
 
         logger.Information(e.Data);
 
-        if (_processOutputs.TryGetValue(process, out var output))
-        {
-            output.Output += e.Data + "\n";
-        }
+        if (_processOutputs.TryGetValue(process, out var output)) output.Output += e.Data + "\n";
     }
 }

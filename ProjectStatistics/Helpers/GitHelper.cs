@@ -7,14 +7,14 @@ namespace ProjectStatistics.Helpers;
 [DependencyProcess<GitDependencyProcess>]
 public class GitHelper : ISingletonDependency
 {
-    private ILogger<GitHelper> Logger { get; }
-    private ProcessHelper ProcessHelper { get; }
-
     public GitHelper(ProcessHelper processHelper, ILogger<GitHelper> logger)
     {
         ProcessHelper = processHelper;
         Logger = logger;
     }
+
+    private ILogger<GitHelper> Logger { get; }
+    private ProcessHelper ProcessHelper { get; }
 
     public Task<bool> CloneRepository(Repository repository, CancellationToken token = default)
     {
@@ -22,15 +22,18 @@ public class GitHelper : ISingletonDependency
         {
             Logger.LogInformation($"Cloning {repository.Name}...");
             var path = await PathHelper.BuildFullPath(repository.Language, "Repositories");
-            
+
             var repositoryPath = Path.Combine(path, repository.Name);
             if (Directory.Exists(repositoryPath))
             {
                 var directoryInfo = new DirectoryInfo(repositoryPath);
-                var dirSize = directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length);
-                if(dirSize < repository.Size)
+                var dirs = directoryInfo.GetDirectories().Where(d => d.Name != ".git").ToList();
+                var dirSize =
+                    dirs.Sum(d => d.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length)) / 1024;
+                if (dirSize < repository.Size)
                 {
-                    Logger.LogInformation($"Repository {repository.Name} already exists, but is smaller than expected. Deleting and cloning again...");
+                    Logger.LogInformation(
+                        $"Repository {repository.Name} already exists, but is smaller than expected. Deleting and cloning again...");
                     Directory.Delete(repositoryPath, true);
                 }
                 else
@@ -41,7 +44,7 @@ public class GitHelper : ISingletonDependency
             }
 
             var result = await ProcessHelper.RunAsync("git", $"clone {repository.CloneUrl}", path);
-            
+
             if (result.Success)
             {
                 Logger.LogInformation($"Cloned {repository.Name} successfully.");
@@ -51,7 +54,7 @@ public class GitHelper : ISingletonDependency
                 Logger.LogError($"Failed to clone {repository.Name}.");
                 token.ThrowIfCancellationRequested();
             }
-            
+
             return result.Success;
         }, token);
     }

@@ -8,5 +8,4 @@ namespace ProjectStatistics;
 )]
 public class ProjectStatisticsModule : AbpModule
 {
-    
 }

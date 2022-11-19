@@ -7,8 +7,8 @@ namespace ProjectStatistics.LanguageStatistics;
 
 public class LanguageStatisticsFactory : ISingletonDependency
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<LanguageStatisticsFactory> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
     public LanguageStatisticsFactory(IServiceProvider serviceProvider, ILogger<LanguageStatisticsFactory> logger)
     {
@@ -30,7 +30,7 @@ public class LanguageStatisticsFactory : ISingletonDependency
 
         return languageStatistics;
     }
-    
+
     public string[] GetSupportedLanguages()
     {
         return _serviceProvider.GetRequiredService<IEnumerable<ILanguageStatistics>>()
