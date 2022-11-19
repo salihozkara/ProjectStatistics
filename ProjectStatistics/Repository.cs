@@ -7,17 +7,16 @@ public class Repository
     public string Name { get; set; }
     public string CloneUrl { get; set; }
     public string Language { get; set; }
+    public long Size { get; set; }
 
-    public Repository(string name, string cloneUrl, string language)
+    public Repository(string name, string cloneUrl, string language, long size)
     {
         Name = name;
         CloneUrl = cloneUrl;
         Language = language;
+        Size = size;
     }
-
-    public Repository()
-    {
-    }
+    
 
     public override string ToString()
     {

@@ -1,5 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using ProjectStatistics.LanguageStatistics;
 using Volo.Abp.DependencyInjection;
 
 namespace ProjectStatistics;
@@ -7,6 +8,7 @@ namespace ProjectStatistics;
 public class CliService : ISingletonDependency
 {
     private readonly LanguageStatisticsFactory _languageStatisticsFactory;
+    private readonly ConcurrentBag<Repository> _errorRepositories = new();
     private ILogger<CliService> Logger { get; }
 
     public CliService(LanguageStatisticsFactory languageStatisticsFactory, ILogger<CliService> logger)
@@ -17,28 +19,58 @@ public class CliService : ISingletonDependency
 
     public async Task RunAsync(string[] args)
     {
-        var repositories =
-            JsonSerializer.Deserialize<Repository[]>(await File.ReadAllTextAsync(CliConsts.RepositoriesPath)) ??
-            Array.Empty<Repository>();
+        var repositories = Resources.RepositoriesJson;
 
         var languages = _languageStatisticsFactory.GetSupportedLanguages();
 
         repositories = repositories
             .Where(r => languages.Contains(r.Language))
 #if DEBUG
-            .GroupBy(r => r.Language)
-            .SelectMany(g => g.Take(1))
+            .TakeLast(1)
 #endif
             .ToArray();
+        
+        
+        var tasks = repositories.Select(r => ProcessRepository(r));
 
-
-        var tasks = repositories.Select(r => Task.Run(() => ProcessRepository(r)));
         await Task.WhenAll(tasks);
+        
+        Logger.LogInformation("Done");
+        
+        var tryCount = 0;
+        while (_errorRepositories.Any() && tryCount < 3)
+        {
+            tryCount++;
+            Logger.LogInformation($"Try {tryCount} to process {_errorRepositories.Count} repositories");
+            tasks = _errorRepositories.Select(r => ProcessRepository(r)).ToList();
+            _errorRepositories.Clear();
+            await Task.WhenAll(tasks);
+        }
+        
+        Logger.LogInformation("Done");
+        
+        if (_errorRepositories.Any())
+        {
+            Logger.LogError($"Failed to process {_errorRepositories.Count} repositories");
+        }
     }
 
-    private Task ProcessRepository(Repository repository)
+    private Task ProcessRepository(Repository repository, CancellationToken token = default)
     {
         var languageStatistics = _languageStatisticsFactory.GetLanguageStatistics(repository.Language);
-        return languageStatistics.GetLanguageStatisticsAsync(repository);
+        var task = Task.Run(async () =>
+        {
+            try
+            {
+                await languageStatistics.GetStatisticsAsync(repository, token);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error while processing {Repository}", repository);
+                _errorRepositories.Add(repository);
+            }
+        }, token);
+        
+        return task;
     }
 }
