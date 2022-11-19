@@ -26,7 +26,6 @@ public class GitDependencyProcess : IDependencyProcess
     {
         var result = await _processHelper.RunAsync("winget", "install --id Git.Git -e --source winget");
         if (result.Success) return true;
-        token.ThrowIfCancellationRequested();
         throw new Exception("Failed to install Git");
     }
 }
