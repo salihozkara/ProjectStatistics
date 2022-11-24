@@ -65,7 +65,7 @@ public class CliService : ISingletonDependency
         
         var tasks = repositories.Select(r => ProcessRepository(r)).OrderBy(_ => Guid.NewGuid()).ToArray();
 
-        await Task.WhenAll(tasks);
+        await RunTask(tasks);
 
         var tryCount = 0;
         while (_errorRepositories.Any() && tryCount < 3)
@@ -74,7 +74,7 @@ public class CliService : ISingletonDependency
             Logger.LogInformation($"Try {tryCount} to process {_errorRepositories.Count} repositories");
             tasks = _errorRepositories.Select(r => ProcessRepository(r)).ToArray();
             _errorRepositories.Clear();
-            await Task.WhenAll(tasks);
+            await RunTask(tasks);
         }
 
         Logger.LogInformation("Done");
@@ -115,6 +115,10 @@ public class CliService : ISingletonDependency
         {
             try
             {
+                if (CliConsts.IsStop)
+                {
+                    return;
+                }
                 await languageStatistics.GetStatisticsAsync(repository, token);
                 try
                 {
@@ -152,5 +156,44 @@ public class CliService : ISingletonDependency
         Directory.Delete(path, false);
 
         return Task.CompletedTask;
+    }
+
+    public Task RunTask(IEnumerable<Task> tasks)
+    {
+        var taskGrouping = tasks.Select((x, i) => new { Index = i, Value = x })
+            .GroupBy(x => x.Index / CliConsts.MaxConcurrentThreads)
+            .Select(x => x.Select(v => v.Value));
+        return RunTask(taskGrouping);
+    }
+    
+    public async Task RunTask(IEnumerable<IEnumerable<Task>> taskList)
+    {
+        using var concurrencySemaphore = new SemaphoreSlim(CliConsts.MaxConcurrentThreads);
+        foreach (var tasks in taskList)
+        {
+            try
+            {
+                await concurrencySemaphore.WaitAsync();
+                using var concurrencySemaphore2 = new SemaphoreSlim(CliConsts.MaxConcurrentThreads);
+                var tasksToRun = tasks.Select(async task =>
+                {
+                    await concurrencySemaphore2.WaitAsync();
+                    try
+                    {
+                        await task;
+                    }
+                    finally
+                    {
+                        concurrencySemaphore2.Release();
+                    }
+                }).ToList();
+                await Task.WhenAll(tasksToRun);
+                Logger.LogInformation(CliConsts.MaxConcurrentThreads + " tasks completed");
+            }
+            finally
+            { 
+                concurrencySemaphore.Release();
+            }
+        }
     }
 }

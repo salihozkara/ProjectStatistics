@@ -31,6 +31,10 @@ public class ProcessHelper : ISingletonDependency
 
     public async Task<ProcessOutput> RunAsync(Process process, string arguments, string? workingDirectory = null)
     {
+        if (CliConsts.IsStop)
+        {
+            throw new Exception("Application is stopped");
+        }
         var result = new ProcessOutput();
         _processOutputs.TryAdd(process, result);
 

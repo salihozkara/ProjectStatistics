@@ -45,6 +45,7 @@ Console.CancelKeyPress += (_, eventArgs) =>
 {
     try
     {
+        CliConsts.IsStop = true;
         var scope = application.ServiceProvider.CreateScope();
         var processHelper = scope.ServiceProvider.GetRequiredService<ProcessHelper>();
         processHelper.AllProcessKill();
