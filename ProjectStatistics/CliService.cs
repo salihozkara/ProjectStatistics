@@ -53,6 +53,7 @@ public class CliService : ISingletonDependency
             .Where(r => languages.Contains(r.Language))
             .OrderByDescending(x => x.Size)
             .Where((r,i) => i % arg.ComputerCount == arg.ComputerIndex)
+            .Where(r=>!File.Exists(Path.Combine(r.Language,"Reports", r.Name + ".xml")))
             .ToArray();
         
 
