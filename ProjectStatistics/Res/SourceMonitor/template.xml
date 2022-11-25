@@ -4,7 +4,7 @@
 
         <!-- path is relative to this command file -->
 
-        <project_file>{{project_directory}}\{{project_name}}.smproj</project_file>
+        <project_file>{{project_file_directory}}\{{project_name}}.smproj</project_file>
 
         <project_language>{{project_language}}</project_language>
 
