@@ -10,6 +10,7 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
 {
     private const string ProjectNameReplacement = "{{project_name}}";
     private const string ProjectDirectoryReplacement = "{{project_directory}}";
+    private const string ProjectFileDirectoryReplacement = "{{project_file_directory}}";
     private const string ProjectLanguageReplacement = "{{project_language}}";
     private const string ReportsPathReplacement = "{{reports_path}}";
 
@@ -68,11 +69,13 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
     {
         return Task.Run(async () =>
         {
-            var directory = await PathHelper.BuildFullPath(repository.Language, "SourceMonitor", repository.Name);
+            var xmlDirectory = await PathHelper.BuildFullPath(repository.Language, "SourceMonitor", repository.Name);
 
             var reportsPath = await PathHelper.BuildFullPath(repository.Language, "Reports");
+            
+            var projectDirectory = await PathHelper.BuildFullPath(repository.Language, "Repositories", repository.Name);
 
-            var xmlPath = Path.Combine(directory, $"{repository.Name}.xml");
+            var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");
 
             if (File.Exists(xmlPath))
             {
@@ -83,7 +86,8 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
 
             var xml = Resources.SourceMonitor.TemplateXml
                 .Replace(ProjectNameReplacement, repository.Name)
-                .Replace(ProjectDirectoryReplacement, directory)
+                .Replace(ProjectDirectoryReplacement, projectDirectory)
+                .Replace(ProjectFileDirectoryReplacement, xmlDirectory)
                 .Replace(ProjectLanguageReplacement, repository.Language)
                 .Replace(ReportsPathReplacement, reportsPath);
             await File.WriteAllTextAsync(xmlPath, xml);
