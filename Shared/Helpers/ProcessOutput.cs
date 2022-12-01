@@ -1,4 +1,4 @@
-﻿namespace ProjectStatistics.Helpers;
+﻿namespace Shared.Helpers;
 
 public class ProcessOutput
 {

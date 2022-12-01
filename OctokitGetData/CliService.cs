@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
-using JsonMerge;
-using JsonNet.ContractResolvers;
 using Newtonsoft.Json;
 using Octokit;
-using OctokitGetData;
 using Shared;
+using Shared.Helpers;
 using Volo.Abp.DependencyInjection;
+
+namespace OctokitGetData;
 
 public class CliService : ISingletonDependency
 {
@@ -28,7 +28,7 @@ public class CliService : ISingletonDependency
                 await File.ReadAllTextAsync(CliConsts.OldValuePath)) ?? oldValue;
 
         var groups = oldValue.GroupBy(x => x.EnumLanguage).ToDictionary(x => x.Key, x => x.ToList());
-        
+
         ConcurrentDictionary<Language, IEnumerable<ExtendRepository>?> result = new();
 
         var tasks = CliConsts.Languages.Select(language => Task.Run(async () =>
@@ -45,10 +45,8 @@ public class CliService : ISingletonDependency
                 var extendRepositories = result[language] as List<ExtendRepository>;
 
                 await foreach (var page in pages)
-                {
                     extendRepositories?.AddRange(page.Items.Select(r =>
                         ExtendRepository.RepositoryExtend(r, language)));
-                }
 
                 result[language] = extendRepositories;
             }))

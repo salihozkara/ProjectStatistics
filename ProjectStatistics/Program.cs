@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectStatistics;
-using ProjectStatistics.DependencyProcesses;
-using ProjectStatistics.Helpers;
 using Serilog;
 using Serilog.Events;
+using Shared.DependencyProcesses;
+using Shared.Helpers;
 using Volo.Abp;
 
 Console.OutputEncoding = Encoding.UTF8;

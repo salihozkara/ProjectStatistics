@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace ProjectStatistics.LanguageStatistics;
+namespace Shared.LanguageStatistics;
 
 public class NullLanguageStatistics : ILanguageStatistics
 {

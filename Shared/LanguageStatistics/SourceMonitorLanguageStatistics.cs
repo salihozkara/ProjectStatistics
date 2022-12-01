@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using ProjectStatistics.DependencyProcesses;
-using ProjectStatistics.Helpers;
+using Shared.DependencyProcesses;
+using Shared.Helpers;
 
-namespace ProjectStatistics.LanguageStatistics;
+namespace Shared.LanguageStatistics;
 
 [Language("C#", "C++", "Java")]
 [DependencyProcess<SourceMonitorDependencyProcess>]
@@ -72,7 +72,7 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
             var xmlDirectory = await PathHelper.BuildFullPath(repository.Language, "SourceMonitor", repository.Name);
 
             var reportsPath = await PathHelper.BuildFullPath(repository.Language, "Reports");
-            
+
             var projectDirectory = await PathHelper.BuildFullPath(repository.Language, "Repositories", repository.Name);
 
             var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");

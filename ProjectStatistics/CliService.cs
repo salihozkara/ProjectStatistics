@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using ProjectStatistics.Helpers;
-using ProjectStatistics.LanguageStatistics;
 using Shared;
+using Shared.Helpers;
+using Shared.LanguageStatistics;
 using Sharprompt;
 using Sharprompt.Fluent;
 using Volo.Abp.DependencyInjection;
@@ -25,71 +25,64 @@ public class CliService : ISingletonDependency
     public async Task RunAsync(string[] args)
     {
         Args arg;
-        if(args.Length == 0)
+        if (args.Length == 0)
         {
             arg = new Args
             {
                 ComputerCount = Prompt.Input<int>("Enter computer count")
             };
             if (arg.ComputerCount > 0)
-            {
-                arg.ComputerIndex = Prompt.Select<int>(o=>o
+                arg.ComputerIndex = Prompt.Select<int>(o => o
                     .WithMessage("Select computer index")
                     .WithItems(Enumerable.Range(0, arg.ComputerCount).ToArray())
                     .WithDefaultValue(0)
                 );
-            }else
-            {
+            else
                 arg = new Args();
-            }
-        }else{
+        }
+        else
+        {
             arg = ArgsHelper.Parse(args);
         }
 
         var languages = _languageStatisticsFactory.GetSupportedLanguages();
-        
+
 
         var repositories = Resources.RepositoriesJson
             .Where(r => languages.Contains(r.Language))
             .OrderByDescending(x => x.Size)
-            .Where((r,i) => i % arg.ComputerCount == arg.ComputerIndex)
-            .Where(r=>!File.Exists(Path.Combine(r.Language,"Reports", r.Name + ".xml")))
+            .Where((r, i) => i % arg.ComputerCount == arg.ComputerIndex)
+            .Where(r => !File.Exists(Path.Combine(r.Language, "Reports", r.Name + ".xml")))
             .ToArray();
-        
+
 
         var count = repositories.Length;
         var totalSize = repositories.Sum(x => x.Size);
         var totalSizeString = ToSizeString(totalSize);
-        
+
         Logger.LogInformation($"Total repositories: {count}");
         Logger.LogInformation($"Total size: {totalSizeString}");
-        
+
         repositories = repositories.OrderBy(_ => Guid.NewGuid()).ToArray();
 
-        foreach (var repository in repositories)
-        {
-            await ProcessRepository(repository);
-        }
+        foreach (var repository in repositories) await ProcessRepository(repository);
 
         var tryCount = 0;
         while (_errorRepositories.Any() && tryCount < 3)
         {
             tryCount++;
             Logger.LogInformation($"Try {tryCount} to process {_errorRepositories.Count} repositories");
-            foreach (var repository in _errorRepositories)
-            {
-                await ProcessRepository(repository);
-            }
+            foreach (var repository in _errorRepositories) await ProcessRepository(repository);
             _errorRepositories.Clear();
         }
 
         Logger.LogInformation("Done");
 
         if (_errorRepositories.Any()) Logger.LogError($"Failed to process {_errorRepositories.Count} repositories");
-        
+
         _errorRepositories.ToJsonFile();
-        
     }
+
     private string ToSizeString(long totalSize)
     {
         var size = totalSize;
@@ -114,6 +107,7 @@ public class CliService : ISingletonDependency
 
         return $"{size} {sizeString}";
     }
+
     private Task ProcessRepository(Repository repository, CancellationToken token = default)
     {
         var languageStatistics = _languageStatisticsFactory.GetLanguageStatistics(repository.Language);
@@ -121,10 +115,7 @@ public class CliService : ISingletonDependency
         {
             try
             {
-                if (CliConsts.IsStop)
-                {
-                    return;
-                }
+                if (CliConsts.IsStop) return;
                 await languageStatistics.GetStatisticsAsync(repository, token);
                 try
                 {
@@ -163,5 +154,4 @@ public class CliService : ISingletonDependency
 
         return Task.CompletedTask;
     }
-
 }

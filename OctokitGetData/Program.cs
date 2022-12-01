@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using OctokitGetData;
 using Serilog;
 using Serilog.Events;
 using Volo.Abp;
 
-Console.OutputEncoding = System.Text.Encoding.UTF8;
+Console.OutputEncoding = Encoding.UTF8;
 
 
 Log.Logger = new LoggerConfiguration()

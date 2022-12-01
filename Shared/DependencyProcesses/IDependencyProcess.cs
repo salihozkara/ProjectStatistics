@@ -1,6 +1,6 @@
 ﻿using Volo.Abp.DependencyInjection;
 
-namespace ProjectStatistics.DependencyProcesses;
+namespace Shared.DependencyProcesses;
 
 public interface IDependencyProcess : IScopedDependency
 {

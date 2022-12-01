@@ -1,6 +1,6 @@
-﻿using ProjectStatistics.Helpers;
+﻿using Shared.Helpers;
 
-namespace ProjectStatistics.DependencyProcesses;
+namespace Shared.DependencyProcesses;
 
 public class GitDependencyProcess : IDependencyProcess
 {

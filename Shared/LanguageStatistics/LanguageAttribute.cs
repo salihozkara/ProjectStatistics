@@ -1,4 +1,4 @@
-﻿namespace ProjectStatistics.LanguageStatistics;
+﻿namespace Shared.LanguageStatistics;
 
 public class LanguageAttribute : Attribute
 {

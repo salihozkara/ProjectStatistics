@@ -19,15 +19,13 @@ public class OctokitGithubService : IGithubService
         int perPage = 30, int page = 1, int maxStarCount = -1)
     {
         for (var i = page; i <= count / perPage; i++)
-        {
-            yield return new Page<Repository>()
+            yield return new Page<Repository>
             {
                 Items = await Factory(i, language, perPage, maxStarCount),
                 TotalCount = count,
                 CurrentPage = i,
                 PageCount = count / perPage
             };
-        }
     }
 
     private async Task<IEnumerable<Repository>> Factory(int page, Language language, int perPage, int maxStarCount)
@@ -41,10 +39,7 @@ public class OctokitGithubService : IGithubService
             PerPage = perPage,
             Page = page
         };
-        if (maxStarCount > 0)
-        {
-            request.Stars = LessThanOrEquals(maxStarCount);
-        }
+        if (maxStarCount > 0) request.Stars = LessThanOrEquals(maxStarCount);
 
         try
         {

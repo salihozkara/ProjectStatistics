@@ -1,13 +1,11 @@
 ﻿using System.Diagnostics;
-using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using System.Text.Json;
 
-namespace ProjectStatistics;
+namespace Shared;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + ",nq}")]
 public class Repository
 {
-    private string GetDebuggerDisplay => $"{Name} ({Index})";
     public Repository(string name, string cloneUrl, string language, long size)
     {
         Name = name;
@@ -16,12 +14,14 @@ public class Repository
         Size = size;
     }
 
+    private string GetDebuggerDisplay => $"{Name} ({Index})";
+
     public string Name { get; set; }
     public string CloneUrl { get; set; }
     public string Language { get; set; }
     public long Size { get; set; }
     public int Index { get; set; }
-    
+
     public string FullName { get; set; }
 
 
@@ -29,6 +29,4 @@ public class Repository
     {
         return JsonSerializer.Serialize(this);
     }
-    
-    
 }

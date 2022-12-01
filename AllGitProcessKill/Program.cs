@@ -4,8 +4,4 @@ using System.Diagnostics;
 
 var gitProcessies = Process.GetProcessesByName("git");
 
-foreach (var process in gitProcessies)
-
-{
-    process.Kill();
-}
+foreach (var process in gitProcessies) process.Kill();

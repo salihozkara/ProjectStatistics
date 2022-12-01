@@ -1,6 +1,6 @@
 ﻿using Volo.Abp.DependencyInjection;
 
-namespace ProjectStatistics.LanguageStatistics;
+namespace Shared.LanguageStatistics;
 
 public interface ILanguageStatistics : ISingletonDependency
 {

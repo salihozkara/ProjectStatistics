@@ -1,4 +1,4 @@
-﻿namespace ProjectStatistics.Helpers;
+﻿namespace Shared.Helpers;
 
 public static class ArgsHelper
 {
@@ -22,10 +22,4 @@ public static class ArgsHelper
     {
         return args.ContainsKey(key) ? args[key] : null;
     }
-}
-
-public class Args
-{
-    public int ComputerCount { get; set; }
-    public int ComputerIndex { get; set; }
 }

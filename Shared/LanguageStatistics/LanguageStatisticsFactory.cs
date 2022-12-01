@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.DependencyInjection;
 
-namespace ProjectStatistics.LanguageStatistics;
+namespace Shared.LanguageStatistics;
 
 public class LanguageStatisticsFactory : ISingletonDependency
 {

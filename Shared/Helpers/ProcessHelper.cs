@@ -5,18 +5,19 @@ using Serilog;
 using Serilog.Core;
 using Volo.Abp.DependencyInjection;
 
-namespace ProjectStatistics.Helpers;
+namespace Shared.Helpers;
 
 public class ProcessHelper : ISingletonDependency
 {
     private readonly ConcurrentDictionary<Process, Logger> _processLoggers = new();
     private readonly ConcurrentDictionary<Process, ProcessOutput> _processOutputs = new();
-    public static bool IsStopRequested { get; set; }
 
     public ProcessHelper(ILogger<ProcessHelper> logger)
     {
         Logger = logger;
     }
+
+    public static bool IsStopRequested { get; set; }
 
     private List<Process> Processes { get; } = new();
     private ILogger<ProcessHelper> Logger { get; }
@@ -33,10 +34,7 @@ public class ProcessHelper : ISingletonDependency
 
     public async Task<ProcessOutput> RunAsync(Process process, string arguments, string? workingDirectory = null)
     {
-        if (IsStopRequested)
-        {
-            throw new Exception("Application is stopped");
-        }
+        if (IsStopRequested) throw new Exception("Application is stopped");
         var result = new ProcessOutput();
         _processOutputs.TryAdd(process, result);
 

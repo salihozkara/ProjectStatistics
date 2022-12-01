@@ -1,11 +1,6 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
-using ProjectStatistics;
-using ProjectStatistics.Helpers;
-using ProjectStatistics.LanguageStatistics;
+﻿using Microsoft.Extensions.Logging;
 using Shared;
-using Sharprompt;
-using Sharprompt.Fluent;
+using Shared.Helpers;
 using Volo.Abp.DependencyInjection;
 
 namespace CloneAllRepository;
@@ -13,21 +8,23 @@ namespace CloneAllRepository;
 public class CliService : ISingletonDependency
 {
     public static bool IsStopRequested = false;
-    private readonly GitHelper _gitHelper;
-    private ILogger<CliService> Logger { get; }
-    
+
     private readonly List<Repository> _errorRepositories = new();
+    private readonly GitHelper _gitHelper;
 
     public CliService(GitHelper gitHelper, ILogger<CliService> logger)
     {
         _gitHelper = gitHelper;
         Logger = logger;
     }
+
+    private ILogger<CliService> Logger { get; }
+
     public async Task RunAsync(string[] args)
     {
         foreach (var repository in Resources.RepositoriesJson)
         {
-            if(IsStopRequested)
+            if (IsStopRequested)
                 break;
             try
             {
@@ -39,13 +36,12 @@ public class CliService : ISingletonDependency
                 _errorRepositories.Add(repository);
             }
         }
-        
+
         var i = 0;
         while (_errorRepositories.Count > 0)
         {
             i++;
             foreach (var errorRepository in _errorRepositories)
-            {
                 try
                 {
                     await _gitHelper.CloneRepository(errorRepository);
@@ -55,17 +51,14 @@ public class CliService : ISingletonDependency
                 {
                     Logger.LogError(e, "Error while cloning repository");
                 }
-            }
-            
-            
-            if (i == 3)
-            {
-                break;
-            }
+
+
+            if (i == 3) break;
         }
-        
+
         _errorRepositories.ToJsonFile();
     }
+
     private string ToSizeString(long totalSize)
     {
         var size = totalSize;
@@ -90,5 +83,4 @@ public class CliService : ISingletonDependency
 
         return $"{size} {sizeString}";
     }
-
 }

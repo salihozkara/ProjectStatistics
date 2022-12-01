@@ -1,4 +1,4 @@
-﻿namespace ProjectStatistics.DependencyProcesses;
+﻿namespace Shared.DependencyProcesses;
 
 public class DependencyProcessAttribute<T> : Attribute where T : IDependencyProcess
 {

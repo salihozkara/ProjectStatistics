@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using ProjectStatistics.DependencyProcesses;
+using Shared.DependencyProcesses;
 using Volo.Abp.DependencyInjection;
 
-namespace ProjectStatistics.Helpers;
+namespace Shared.Helpers;
 
 [DependencyProcess<GitDependencyProcess>]
 public class GitHelper : ISingletonDependency
@@ -21,7 +21,7 @@ public class GitHelper : ISingletonDependency
         return Task.Run(async () =>
         {
             Logger.LogInformation($"Cloning {repository.FullName}...");
-            var path = await PathHelper.BuildFullPath(repository.Language, "Repositories",repository.FullName);
+            var path = await PathHelper.BuildFullPath(repository.Language, "Repositories", repository.FullName);
 
             var repositoryPath = Path.Combine(path, repository.FullName);
             if (Directory.Exists(repositoryPath))

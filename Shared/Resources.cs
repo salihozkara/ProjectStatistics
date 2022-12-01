@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 
-namespace ProjectStatistics;
+namespace Shared;
 
 public static class Resources
 {

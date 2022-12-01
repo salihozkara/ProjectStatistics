@@ -1,5 +1,4 @@
 ﻿using Shared;
-using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
 
 namespace CloneAllRepository;
