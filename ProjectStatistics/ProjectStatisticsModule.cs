@@ -1,10 +1,10 @@
-﻿using Volo.Abp.Autofac;
+﻿using Shared;
 using Volo.Abp.Modularity;
 
 namespace ProjectStatistics;
 
 [DependsOn(
-    typeof(AbpAutofacModule)
+    typeof(SharedModule)
 )]
 public class ProjectStatisticsModule : AbpModule
 {

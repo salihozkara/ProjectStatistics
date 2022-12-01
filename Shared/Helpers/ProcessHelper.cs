@@ -11,6 +11,7 @@ public class ProcessHelper : ISingletonDependency
 {
     private readonly ConcurrentDictionary<Process, Logger> _processLoggers = new();
     private readonly ConcurrentDictionary<Process, ProcessOutput> _processOutputs = new();
+    public static bool IsStopRequested { get; set; }
 
     public ProcessHelper(ILogger<ProcessHelper> logger)
     {
@@ -26,12 +27,13 @@ public class ProcessHelper : ISingletonDependency
             .MinimumLevel.Debug()
             .Enrich.FromLogContext()
             .WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), $"Logs/Process_{processId}.txt"))
+            .WriteTo.Console()
             .CreateLogger();
     }
 
     public async Task<ProcessOutput> RunAsync(Process process, string arguments, string? workingDirectory = null)
     {
-        if (CliConsts.IsStop)
+        if (IsStopRequested)
         {
             throw new Exception("Application is stopped");
         }
@@ -40,6 +42,11 @@ public class ProcessHelper : ISingletonDependency
 
         process.StartInfo.Arguments = arguments;
         process.StartInfo.WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        process.StartInfo.CreateNoWindow = true;
+        process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
 
 
         process.Exited += processOnExited();

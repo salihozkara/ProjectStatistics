@@ -1,6 +1,6 @@
 ﻿using System.Text;
+using CloneAllRepository;
 using Microsoft.Extensions.DependencyInjection;
-using ProjectStatistics;
 using ProjectStatistics.DependencyProcesses;
 using ProjectStatistics.Helpers;
 using Serilog;
@@ -19,7 +19,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 
-using var application = AbpApplicationFactory.Create<ProjectStatisticsModule>(
+using var application = AbpApplicationFactory.Create<CloneAllRepositoryModule>(
     options =>
     {
         options.UseAutofac();
@@ -45,7 +45,7 @@ Console.CancelKeyPress += (_, eventArgs) =>
 {
     try
     {
-        CliConsts.IsStop = true;
+        CliService.IsStopRequested = true;
         ProcessHelper.IsStopRequested = true;
         var scope = application.ServiceProvider.CreateScope();
         var processHelper = scope.ServiceProvider.GetRequiredService<ProcessHelper>();

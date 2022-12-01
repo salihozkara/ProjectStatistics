@@ -1,4 +1,4 @@
-﻿using JsonMerge;
+﻿using Shared;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
 
@@ -6,7 +6,7 @@ namespace OctokitGetData;
 
 [DependsOn(
     typeof(AbpAutofacModule),
-    typeof(JsonMergeModule)
+    typeof(SharedModule)
     )]
 public class OctokitGetDataModule : AbpModule
 {

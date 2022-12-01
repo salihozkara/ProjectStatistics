@@ -21,6 +21,8 @@ public class Repository
     public string Language { get; set; }
     public long Size { get; set; }
     public int Index { get; set; }
+    
+    public string FullName { get; set; }
 
 
     public override string ToString()

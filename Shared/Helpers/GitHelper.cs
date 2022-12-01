@@ -20,10 +20,10 @@ public class GitHelper : ISingletonDependency
     {
         return Task.Run(async () =>
         {
-            Logger.LogInformation($"Cloning {repository.Name}...");
-            var path = await PathHelper.BuildFullPath(repository.Language, "Repositories");
+            Logger.LogInformation($"Cloning {repository.FullName}...");
+            var path = await PathHelper.BuildFullPath(repository.Language, "Repositories",repository.FullName);
 
-            var repositoryPath = Path.Combine(path, repository.Name);
+            var repositoryPath = Path.Combine(path, repository.FullName);
             if (Directory.Exists(repositoryPath))
             {
                 var directoryInfo = new DirectoryInfo(repositoryPath);
@@ -33,12 +33,12 @@ public class GitHelper : ISingletonDependency
                 if (dirSize < repository.Size)
                 {
                     Logger.LogInformation(
-                        $"Repository {repository.Name} already exists, but is smaller than expected. Deleting and cloning again...");
+                        $"Repository {repository.FullName} already exists, but is smaller than expected. Deleting and cloning again...");
                     Directory.Delete(repositoryPath, true);
                 }
                 else
                 {
-                    Logger.LogInformation($"Repository {repository.Name} already exists. Skipping...");
+                    Logger.LogInformation($"Repository {repository.FullName} already exists. Skipping...");
                     return true;
                 }
             }
@@ -47,11 +47,11 @@ public class GitHelper : ISingletonDependency
 
             if (result.Success)
             {
-                Logger.LogInformation($"Cloned {repository.Name} successfully.");
+                Logger.LogInformation($"Cloned {repository.FullName} successfully.");
             }
             else
             {
-                Logger.LogError($"Failed to clone {repository.Name}.");
+                Logger.LogError($"Failed to clone {repository.FullName}.");
                 token.ThrowIfCancellationRequested();
             }
 
