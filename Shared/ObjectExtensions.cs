@@ -10,7 +10,11 @@ public static class ObjectExtensions
     public static void ToJsonFile(this object obj, string? path = null,
         [CallerArgumentExpression("obj")] string callerExp = "")
     {
-        path ??= Path.Combine("./Jsons", callerExp + ".json");
+        if(path is null)
+        {
+            Resources.Jsons.SaveJson(callerExp+".json", obj);
+            return;
+        }
 
         path = Path.GetFullPath(path);
 

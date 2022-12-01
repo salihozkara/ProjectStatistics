@@ -23,9 +23,9 @@ public class CliService : ISingletonDependency
     {
         var oldValue = new List<ExtendRepository>();
 
-        if (File.Exists(CliConsts.OldValuePath))
+        if (File.Exists(Resources.RepositoriesJson.Path))
             oldValue = JsonConvert.DeserializeObject<List<ExtendRepository>>(
-                await File.ReadAllTextAsync(CliConsts.OldValuePath)) ?? oldValue;
+                await File.ReadAllTextAsync(Resources.RepositoriesJson.Path)) ?? oldValue;
 
         var groups = oldValue.GroupBy(x => x.EnumLanguage).ToDictionary(x => x.Key, x => x.ToList());
 
@@ -64,6 +64,6 @@ public class CliService : ISingletonDependency
 
 
         repos.ToJsonFile($"./Jsons/repos{repos.Count}.json");
-        repos.ToJsonFile(CliConsts.OldValuePath);
+        repos.ToJsonFile(Resources.RepositoriesJson.Path);
     }
 }

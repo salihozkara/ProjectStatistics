@@ -55,7 +55,7 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
             _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.Name);
             var xmlPath = await CreateSourceMonitorXml(repository);
 
-            var result = await _processHelper.RunAsync(Resources.SourceMonitor.SourceMonitorExe, $"/C \"{xmlPath}\"");
+            var result = await _processHelper.RunAsync(Resources.SourceMonitor.SourceMonitorExe.Value, $"/C \"{xmlPath}\"");
             if (result.Success)
                 _logger.LogInformation("Statistics for {RepositoryName} calculated successfully", repository.Name);
             else
@@ -84,7 +84,7 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
                 return xmlPath;
             }
 
-            var xml = Resources.SourceMonitor.TemplateXml
+            var xml = Resources.SourceMonitor.TemplateXml.Value
                 .Replace(ProjectNameReplacement, repository.Name)
                 .Replace(ProjectDirectoryReplacement, projectDirectory)
                 .Replace(ProjectFileDirectoryReplacement, xmlDirectory)

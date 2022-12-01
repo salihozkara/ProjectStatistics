@@ -48,7 +48,7 @@ public class CliService : ISingletonDependency
         var languages = _languageStatisticsFactory.GetSupportedLanguages();
 
 
-        var repositories = Resources.RepositoriesJson
+        var repositories = Resources.RepositoriesJson.Value
             .Where(r => languages.Contains(r.Language))
             .OrderByDescending(x => x.Size)
             .Where((r, i) => i % arg.ComputerCount == arg.ComputerIndex)

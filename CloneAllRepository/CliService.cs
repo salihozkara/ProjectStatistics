@@ -22,7 +22,7 @@ public class CliService : ISingletonDependency
 
     public async Task RunAsync(string[] args)
     {
-        foreach (var repository in Resources.RepositoriesJson)
+        foreach (var repository in Resources.RepositoriesJson.Value)
         {
             if (IsStopRequested)
                 break;

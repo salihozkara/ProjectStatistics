@@ -10,7 +10,7 @@ public class SourceMonitorDependencyProcess : IDependencyProcess
         try
         {
             var p = Resources.SourceMonitor.SourceMonitorExe;
-            return File.Exists(p.StartInfo.FileName);
+            return File.Exists(p.Value.StartInfo.FileName);
         }
         catch (Exception e)
         {
